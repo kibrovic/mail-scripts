@@ -9,7 +9,15 @@ import smtplib
 import gnupg
 import os
 
+from configparser import ConfigParser
+
 gpg = gnupg.GPG(gnupghome='%s/.gnupg/' % os.getenv("HOME"))
+
+# Read userinfo config from ./secrets.ini file
+secrets_object = ConfigParser()
+secrets_object.read("secrets.ini")
+
+userinfo = secrets_object["DEFAULT"]
 
 signature="""
 All the best,
@@ -19,9 +27,9 @@ All the best,
 # Throws error on port 465 so using 587
 def sendemail(to_addr_list, cc_addr_list,
               subject, message,
-              from_addr='kenan@occrp.org',
-              bcc_addr_list=['kenan@occrp.org'],
-              login='kenan@occrp.org', password='APP_PASSWORD',
+              from_addr=userinfo["USERNAME"],
+              bcc_addr_list=[userinfo["USERNAME"]],
+              login=userinfo["USERNAME"], password=userinfo["PASSWORD"],
               smtpserver='smtp.gmail.com:587'):
     header = 'From: %s\n' % from_addr
     header += 'To: %s\n' % ','.join(to_addr_list)
